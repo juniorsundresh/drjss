@@ -3,7 +3,7 @@
 -----------------------------------------*/
 :root {
   --white-color: #ffffff;
-  --primary-color: #2e3192;
+  --primary-color: #0DD53F;
   --dark-color: #000000;
   --body-font-family: "Metropolis", sans-serif;
   --h1-font-size: clamp(2.25rem, 5vw + 1rem, 3.25rem);
@@ -23,7 +23,7 @@
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
-  --secondary-color: #2e3192;
+  --secondary-color: #0DD53F;
   --p-color: #717275;
 }
 
@@ -682,7 +682,7 @@ General Section
   color: #fff;
   font-weight: 700;
   font-size: 15px;
-  background-color: #2e3192;
+  background-color: var(--primary-color);
   padding: 17px 65px;
   margin: 0 auto;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.378);
@@ -728,7 +728,7 @@ General Section
   color: #fff;
   font-weight: 700;
   font-size: 15px;
-  background-color: #2e3192;
+  background-color: var(--primary-color);
   padding: 17px 75px;
   margin: 0 auto;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.378);
@@ -774,7 +774,7 @@ General Section
   color: #fff;
   font-weight: 700;
   font-size: 15px;
-  background-color: #2e3192;
+  background-color: var(--primary-color);
   padding: 17px 46px;
   margin: 0 auto;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.378);
@@ -998,7 +998,7 @@ General Section
 Notice Board            
 -----------------------------------------*/
 .notice-section {
-  background: url(../images/newnotice.jpeg) no-repeat #2e3192;
+  background: url(../images/newnotice.jpeg) no-repeat var(--primary-color);
   height: 106px;
   padding: 0;
   overflow: hidden;
@@ -1085,7 +1085,7 @@ TEAM CARDS
   margin-bottom: 25px;
   font-size: 16px;
   font-weight: 500;
-  color: #2e3192;
+  color: var(--primary-color);
 }
 
 .section-team .header-section .title {
@@ -1101,7 +1101,7 @@ TEAM CARDS
 }
 
 .section-team .single-person:hover {
-  background: linear-gradient(to right, #a072e0, #2e3192);
+  background: linear-gradient(to right, #a072e0, var(--primary-color));
 }
 
 .section-team .single-person .person-image {
@@ -1141,7 +1141,7 @@ TEAM CARDS
 .section-team .single-person:hover .person-image .icon {
   background: none;
   background-color: #ffffff00;
-  color: #2e3192;
+  color: var(--primary-color);
 }
 
 .section-team .single-person .person-info .full-name {
@@ -1153,7 +1153,7 @@ TEAM CARDS
 .section-team .single-person .person-info .speciality {
   text-transform: uppercase;
   font-size: 14px;
-  color: #2e3192;
+  color: var(--primary-color);
 }
 
 .section-team .single-person:hover .full-name,
@@ -1174,7 +1174,7 @@ TEAM CARDS
   margin-bottom: 25px;
   font-size: 16px;
   font-weight: 500;
-  color: #2e3192;
+  color: var(--primary-color);
 }
 
 .section-tea .header-section .title {
@@ -1190,7 +1190,7 @@ TEAM CARDS
 }
 
 .section-tea .single-person:hover {
-  background: linear-gradient(to right, #a072e0, #2e3192);
+  background: linear-gradient(to right, #a072e0, var(--primary-color));
 }
 
 .section-tea .single-person .person-image {
@@ -1230,7 +1230,7 @@ TEAM CARDS
 .section-tea .single-person:hover .person-image .icon {
   background: none;
   background-color: #ffffff00;
-  color: #2e3192;
+  color: var(--primary-color);
 }
 
 .section-tea .single-person .person-info .full-name {
@@ -1242,7 +1242,7 @@ TEAM CARDS
 .section-tea .single-person .person-info .speciality {
   /* text-transform: uppercase; */
   font-size: 14px;
-  color: #2e3192;
+  color: var(--primary-color);
 }
 
 .section-tea .single-person:hover .full-name,
@@ -1298,7 +1298,7 @@ CONTACT US PAGE
   left: 18px;
   right: 18px;
   bottom: 18px;
-  background: linear-gradient(to right, #a072e0, #2e3192);
+  background: linear-gradient(to right, #a072e0, var(--primary-color));
   box-shadow: 2px 2px 15px 5px #7900ff38;
   border-radius: 15px;
   display: flex;
@@ -1459,7 +1459,7 @@ OUR RECRUITER
   width: 100%;
   height: 50px;
   line-height: 50px;
-  background-color: #2e3192;
+  background-color: var(--primary-color);
   color: #fff;
   text-align: center;
   font-size: 18px;
