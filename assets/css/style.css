@@ -3,7 +3,7 @@
 -----------------------------------------*/
 :root {
   --white-color: #ffffff;
-  --primary-color: #0DD53F;
+  --primary-color: #ffd700;
   --dark-color: #000000;
   --body-font-family: "Metropolis", sans-serif;
   --h1-font-size: clamp(2.25rem, 5vw + 1rem, 3.25rem);
@@ -23,7 +23,7 @@
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
-  --secondary-color: #0DD53F;
+  --secondary-color: #b8860b;
   --p-color: #717275;
 }
 
