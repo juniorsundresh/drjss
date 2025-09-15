@@ -133,7 +133,7 @@ strong {
   }
 
   .navbar .nav-item:hover .nav-link {
-    color: #fff;
+    color: var(--secondary-color);
   }
 
   .navbar .dropdown-menu.fade-down {
@@ -1473,4 +1473,26 @@ OUR RECRUITER
   100% {
     transform: translateX(-100%);
   }
+}
+
+.sheet-wrapper {
+  max-height: 400px;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.sheet-row {
+  display: flex;
+}
+
+.sheet-cell {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #dee2e6;
 }
