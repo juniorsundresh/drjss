@@ -1474,3 +1474,9 @@ OUR RECRUITER
     transform: translateX(-100%);
   }
 }
+
+.sheet-wrapper {
+  max-height: 400px;
+  overflow-y: auto;
+  width: 100%;
+}
