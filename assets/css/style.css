@@ -133,7 +133,7 @@ strong {
   }
 
   .navbar .nav-item:hover .nav-link {
-    color: #fff;
+    color: var(--secondary-color);
   }
 
   .navbar .dropdown-menu.fade-down {
