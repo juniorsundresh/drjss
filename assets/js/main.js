@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   loadSheet('research-table', 'assets/research%20papers.xlsx');
   loadSheet('projects-table', 'assets/projects.xlsx');
+  loadSheet('teaching-exp-table', 'assets/teaching_exp.xlsx');
 });
 
 function loadSheet(elementId, url) {
