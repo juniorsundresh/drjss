@@ -1,14 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const table = document.getElementById('research-table');
-  if (table) {
-    fetch('assets/research%20papers.xlsx')
-      .then(response => response.arrayBuffer())
-      .then(data => {
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const html = XLSX.utils.sheet_to_html(workbook.Sheets[sheetName]);
-        table.innerHTML = html;
-      })
-      .catch(error => console.error('Error loading research papers:', error));
-  }
+  loadSheet('research-table', 'assets/research%20papers.xlsx');
+  loadSheet('projects-table', 'assets/projects.xlsx');
 });
+
+function loadSheet(elementId, url) {
+  const table = document.getElementById(elementId);
+  if (!table) return;
+  fetch(url)
+    .then(res => res.arrayBuffer())
+    .then(data => {
+      const wb = XLSX.read(data, { type: 'array' });
+      const sheet = wb.SheetNames[0];
+      table.innerHTML = XLSX.utils.sheet_to_html(wb.Sheets[sheet]);
+    })
+    .catch(err => console.error(`Error loading ${url}:`, err));
+}
+
