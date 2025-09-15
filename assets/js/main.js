@@ -5,14 +5,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function loadSheet(elementId, url) {
-  const table = document.getElementById(elementId);
-  if (!table) return;
+  const container = document.getElementById(elementId);
+  if (!container) return;
   fetch(url)
     .then(res => res.arrayBuffer())
     .then(data => {
       const wb = XLSX.read(data, { type: 'array' });
       const sheet = wb.SheetNames[0];
-      table.innerHTML = XLSX.utils.sheet_to_html(wb.Sheets[sheet]);
+      container.innerHTML = XLSX.utils.sheet_to_html(wb.Sheets[sheet]);
     })
     .catch(err => console.error(`Error loading ${url}:`, err));
 }
