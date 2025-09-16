@@ -13,21 +13,41 @@ function loadSheet(elementId, url) {
     .then(data => {
       const wb = XLSX.read(data, { type: 'array' });
       const sheet = wb.SheetNames[0];
-      const json = XLSX.utils.sheet_to_json(wb.Sheets[sheet], { header: 1 });
-      const maxCols = Math.max(0, ...json.map(row => row.length));
-      const html = json
-        .map(row =>
-          `<div class="sheet-row">${Array.from({ length: maxCols }, (_, i) => {
-            const value = row?.[i];
-            const cellHtml =
-              typeof value === 'string' && /https?:\/\/\S+/.test(value)
-                ? `<a href="${value}" target="_blank" rel="noopener">${value}</a>`
-                : value ?? '';
-            return `<div class="sheet-cell">${cellHtml}</div>`;
-          }).join('')}</div>`
-        )
-        .join('');
-      container.innerHTML = `<div class="sheet">${html}</div>`;
+      const worksheet = wb.Sheets[sheet];
+      if (!worksheet || !worksheet['!ref']) {
+        container.innerHTML = '<div class="sheet"></div>';
+        return;
+      }
+
+      const range = XLSX.utils.decode_range(worksheet['!ref']);
+      const rows = [];
+
+      for (let rowNum = range.s.r; rowNum <= range.e.r; rowNum += 1) {
+        const cells = [];
+
+        for (let colNum = range.s.c; colNum <= range.e.c; colNum += 1) {
+          const address = XLSX.utils.encode_cell({ r: rowNum, c: colNum });
+          const cell = worksheet[address];
+          let cellHtml = '';
+
+          if (cell) {
+            if (cell.l && cell.l.Target) {
+              const linkText = cell.v || cell.l.Target;
+              cellHtml = `<a href="${cell.l.Target}" target="_blank" rel="noopener">${linkText}</a>`;
+            } else if (cell.w != null) {
+              cellHtml = cell.w;
+            } else if (cell.v != null) {
+              cellHtml = cell.v;
+            }
+          }
+
+          cells.push(`<div class="sheet-cell">${cellHtml}</div>`);
+        }
+
+        rows.push(`<div class="sheet-row">${cells.join('')}</div>`);
+      }
+
+      container.innerHTML = `<div class="sheet">${rows.join('')}</div>`;
     })
     .catch(err => console.error(`Error loading ${url}:`, err));
 }
