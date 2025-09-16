@@ -34,6 +34,15 @@ function loadSheet(elementId, url) {
             if (cell.l && cell.l.Target) {
               const linkText = cell.v || cell.l.Target;
               cellHtml = `<a href="${cell.l.Target}" target="_blank" rel="noopener">${linkText}</a>`;
+            } else if (typeof cell.f === 'string' && cell.f.startsWith('HYPERLINK(')) {
+              const hyperlinkMatch = cell.f.match(/^HYPERLINK\(\s*(["'])(.*?)\1\s*,\s*(["'])(.*?)\3\s*\)$/i);
+              if (hyperlinkMatch) {
+                const url = hyperlinkMatch[2].replace(/""/g, '"');
+                const label = hyperlinkMatch[4].replace(/""/g, '"');
+                cellHtml = `<a href="${url}" target="_blank" rel="noopener">${label}</a>`;
+              } else if (cell.v != null) {
+                cellHtml = cell.v;
+              }
             } else if (cell.w != null) {
               cellHtml = cell.w;
             } else if (cell.v != null) {
