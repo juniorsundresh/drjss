@@ -1482,17 +1482,18 @@ OUR RECRUITER
 }
 
 .sheet {
-  display: flex;
-  flex-direction: column;
+  display: table;
   width: 100%;
+  border-collapse: collapse;
 }
 
 .sheet-row {
-  display: flex;
+  display: table-row;
 }
 
 .sheet-cell {
-  flex: 1;
+  display: table-cell;
   padding: 8px;
   border: 1px solid #dee2e6;
+  text-align: center;
 }
