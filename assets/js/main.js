@@ -17,9 +17,14 @@ function loadSheet(elementId, url) {
       const maxCols = Math.max(0, ...json.map(row => row.length));
       const html = json
         .map(row =>
-          `<div class="sheet-row">${Array.from({ length: maxCols }, (_, i) =>
-            `<div class="sheet-cell">${row[i] !== undefined ? row[i] : ''}</div>`
-          ).join('')}</div>`
+          `<div class="sheet-row">${Array.from({ length: maxCols }, (_, i) => {
+            const value = row?.[i];
+            const cellHtml =
+              typeof value === 'string' && /https?:\/\/\S+/.test(value)
+                ? `<a href="${value}" target="_blank" rel="noopener">${value}</a>`
+                : value ?? '';
+            return `<div class="sheet-cell">${cellHtml}</div>`;
+          }).join('')}</div>`
         )
         .join('');
       container.innerHTML = `<div class="sheet">${html}</div>`;
