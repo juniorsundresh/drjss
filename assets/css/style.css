@@ -700,7 +700,7 @@ General Section
   top: 0;
   height: 490%;
   width: 140%;
-  background: #fff;
+  background: var(--secondary-color);
   -webkit-transition: all 0.5s ease-in-out;
   transition: all 0.5s ease-in-out;
   -webkit-transform: translateX(-88%) translateY(-25%) rotate(60deg);
@@ -746,7 +746,7 @@ General Section
   top: 0;
   height: 490%;
   width: 130%;
-  background: #fff;
+  background: var(--secondary-color);
   -webkit-transition: all 0.5s ease-in-out;
   transition: all 0.5s ease-in-out;
   -webkit-transform: translateX(-88%) translateY(-25%) rotate(60deg);
