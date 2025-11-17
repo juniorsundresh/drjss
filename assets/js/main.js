@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadSheet('projects-table', 'assets/projects.xlsx');
   loadSheet('teaching-exp-table', 'assets/teaching_exp.xlsx');
   loadSheet('tamil-articles-table', 'assets/tamil_articles.xlsx');
+  loadSheet('tamil-articles-table', 'assets/awards.xlsx');
 });
 
 function loadSheet(elementId, url) {
