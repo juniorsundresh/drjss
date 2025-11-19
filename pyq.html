@@ -212,7 +212,7 @@
 </head>
 <body>
 
-<h2>📘 Question Bank Viewer</h2>
+<h2>📘 Question Bank</h2>
 
 <label>Year</label>
 <select id="year" onchange="loadYearJSON()">
@@ -337,7 +337,6 @@ function showQuestions() {
                 <div class="question-type">${q.question_type}</div>
                 <p>${q.question_text}</p>
                 <small><b>Ref:</b> ${q.references.bookname} | Page: ${q.references.pageno}</small><br>
-                <small><b>ID:</b> ${q.id} | <b>TID:</b> ${q.tid}</small>
             `;
             output.appendChild(card);
         });
