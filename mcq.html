@@ -205,10 +205,11 @@
         border-radius: 10px;
         box-shadow: 0 0 6px rgba(0,0,0,0.1);
     }
-    .option { margin: 3px 0; }
+    .option { margin: 4px 0; }
     .correct {
         color: green;
         font-weight: bold;
+        margin-top: 10px;
     }
     .explanation {
         margin-top: 10px;
@@ -221,7 +222,7 @@
 
 <body>
 
-<h2>📘 MCQ Question Browser</h2>
+<h2>📘 MCQ Browser</h2>
 
 <label>Subject</label>
 <select id="subject"></select>
@@ -240,48 +241,41 @@
 <script>
 let db = null;
 
-// Load mcq.json from assets/json/
+// Load mcqn.json
 window.onload = () => {
-    fetch("assets/json/mcq.json")
+    fetch("assets/json/mcqn.json")
         .then(res => res.json())
         .then(json => {
             db = json;
             populateSubjects();
         })
-        .catch(err =>
-            alert("Could not load assets/json/mcq.json\n" + err)
-        );
+        .catch(err => alert("Error loading mcqn.json:\n" + err));
 };
 
 function populateSubjects() {
-    const subjectSelect = document.getElementById("subject");
-    subjectSelect.innerHTML = "";
+    const sub = document.getElementById("subject");
+    sub.innerHTML = "";
 
     for (let subject in db.subjects) {
-        let option = document.createElement("option");
-        option.value = subject;
-        option.textContent = subject;
-        subjectSelect.appendChild(option);
+        sub.innerHTML += `<option value="${subject}">${subject}</option>`;
     }
 
-    subjectSelect.onchange = populateParts;
+    sub.onchange = populateParts;
     populateParts();
 }
 
 function populateParts() {
     const subject = document.getElementById("subject").value;
-    const partSelect = document.getElementById("part");
-    partSelect.innerHTML = "";
-
     const parts = db.subjects[subject].parts;
-    for (let part in parts) {
-        let option = document.createElement("option");
-        option.value = part;
-        option.textContent = part;
-        partSelect.appendChild(option);
+
+    const partSel = document.getElementById("part");
+    partSel.innerHTML = "";
+
+    for (let p in parts) {
+        partSel.innerHTML += `<option value="${p}">${p}</option>`;
     }
 
-    partSelect.onchange = populateChapters;
+    partSel.onchange = populateChapters;
     populateChapters();
 }
 
@@ -289,15 +283,13 @@ function populateChapters() {
     const subject = document.getElementById("subject").value;
     const part = document.getElementById("part").value;
 
-    const chapterSelect = document.getElementById("chapter");
-    chapterSelect.innerHTML = "";
-
     const chapters = db.subjects[subject].parts[part].chapters;
+
+    const chapSel = document.getElementById("chapter");
+    chapSel.innerHTML = "";
+
     for (let ch in chapters) {
-        let option = document.createElement("option");
-        option.value = ch;
-        option.textContent = ch;
-        chapterSelect.appendChild(option);
+        chapSel.innerHTML += `<option value="${ch}">${ch}</option>`;
     }
 }
 
@@ -312,24 +304,21 @@ function showMCQs() {
     const questions = db.subjects[subject].parts[part].chapters[chapter].questions;
 
     questions.forEach(q => {
-        let card = document.createElement("div");
-        card.className = "mcq-card";
+        output.innerHTML += `
+            <div class="mcq-card">
+                <h3>Q${q.id}</h3>
+                <p>${q.question_text}</p>
 
-        card.innerHTML = `
-            <h3>Q${q.id}</h3>
-            <p>${q.question_text}</p>
+                <div class="option">A) ${q.options.A}</div>
+                <div class="option">B) ${q.options.B}</div>
+                <div class="option">C) ${q.options.C}</div>
+                <div class="option">D) ${q.options.D}</div>
 
-            <div class="option">A) ${q.options.A}</div>
-            <div class="option">B) ${q.options.B}</div>
-            <div class="option">C) ${q.options.C}</div>
-            <div class="option">D) ${q.options.D}</div>
+                <div class="correct">Correct Answer: ${q.correctanswer}</div>
 
-            <p class="correct">Correct: ${q.correct_answer}</p>
-
-            <div class="explanation">${q.explanation}</div>
+                ${q.explanation ? `<div class="explanation">${q.explanation}</div>` : ""}
+            </div>
         `;
-
-        output.appendChild(card);
     });
 }
 </script>
