@@ -183,6 +183,43 @@
     <!-- ======= end Header ============ -->
     <!-- ======= Start Section 1 ======= -->
 <script disable-devtool-auto src='https://cdn.jsdelivr.net/npm/disable-devtool@latest'></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MCQ Viewer</title>
+
+<style>
+    body { font-family: Arial; padding: 20px; background: #f4f4f4; }
+    select, button { width: 100%; padding: 10px; margin: 8px 0; font-size: 16px; }
+    .mcq-card {
+        background: white; padding: 15px; margin: 15px 0;
+        border-radius: 8px; box-shadow: 0 0 6px rgba(0,0,0,0.1);
+    }
+    .mcq-question { font-weight: bold; margin-bottom: 10px; }
+</style>
+</head>
+
+<body>
+
+<h2>📘 MCQ Viewer</h2>
+
+<!-- THE DROPDOWNS (must exist before JS runs) -->
+<label>Select Year</label>
+<select id="year"></select>
+
+<label>Select Subject</label>
+<select id="subject"></select>
+
+<label>Select Chapter</label>
+<select id="chapter"></select>
+
+<button onclick="showMCQs()">Show MCQs</button>
+
+<hr>
+
+<div id="output"></div>
+
 <script>
 let mcqDB = [];
 let filteredMCQs = [];
@@ -192,9 +229,10 @@ window.onload = () => {
     fetch("assets/json/mcqn.json")
     .then(r => r.json())
     .then(json => {
-        if (Array.isArray(json)) {
-            mcqDB = json;
-        } else {
+
+        // Detect array
+        if (Array.isArray(json)) mcqDB = json;
+        else {
             for (let key in json) {
                 if (Array.isArray(json[key])) {
                     mcqDB = json[key];
@@ -208,18 +246,16 @@ window.onload = () => {
     .catch(err => alert("Error loading JSON: " + err));
 };
 
-// ---------------------- DROPDOWNS ----------------------
-
 function loadYears() {
     const yearSelect = document.getElementById("year");
     yearSelect.innerHTML = "";
 
     let years = [...new Set(mcqDB.map(q => q.year))];
 
-    years.forEach(year => {
+    years.forEach(y => {
         let opt = document.createElement("option");
-        opt.value = year;
-        opt.textContent = year;
+        opt.value = y;
+        opt.textContent = y;
         yearSelect.appendChild(opt);
     });
 
@@ -236,10 +272,10 @@ function loadSubjects() {
         mcqDB.filter(q => q.year === year).map(q => q.subject)
     )];
 
-    subjects.forEach(sub => {
+    subjects.forEach(s => {
         let opt = document.createElement("option");
-        opt.value = sub;
-        opt.textContent = sub;
+        opt.value = s;
+        opt.textContent = s;
         subjectSelect.appendChild(opt);
     });
 
@@ -251,22 +287,22 @@ function loadChapters() {
     const year = document.getElementById("year").value;
     const subject = document.getElementById("subject").value;
     const chapterSelect = document.getElementById("chapter");
+
     chapterSelect.innerHTML = "";
 
     let chapters = [...new Set(
-        mcqDB.filter(q => q.year === year && q.subject === subject)
-             .map(q => q.chapter)
+        mcqDB
+        .filter(q => q.year === year && q.subject === subject)
+        .map(q => q.chapter)
     )];
 
-    chapters.forEach(ch => {
+    chapters.forEach(c => {
         let opt = document.createElement("option");
-        opt.value = ch;
-        opt.textContent = ch;
+        opt.value = c;
+        opt.textContent = c;
         chapterSelect.appendChild(opt);
     });
 }
-
-// ---------------------- MCQ DISPLAY ----------------------
 
 function showMCQs() {
     const year = document.getElementById("year").value;
@@ -287,7 +323,7 @@ function displayMCQ() {
     const output = document.getElementById("output");
     output.innerHTML = "";
 
-    const q = filteredMCQs[currentIndex];
+    let q = filteredMCQs[currentIndex];
     if (!q) return;
 
     let card = document.createElement("div");
@@ -296,10 +332,10 @@ function displayMCQ() {
     card.innerHTML = `
         <div class="mcq-question">${q.que}</div>
 
-        <button class="option-btn" data-opt="A">A. ${q.option_a}</button><br>
-        <button class="option-btn" data-opt="B">B. ${q.option_b}</button><br>
-        <button class="option-btn" data-opt="C">C. ${q.option_c}</button><br>
-        <button class="option-btn" data-opt="D">D. ${q.option_d}</button><br><br>
+        <button class="optBtn" data-opt="A">A. ${q.option_a}</button><br>
+        <button class="optBtn" data-opt="B">B. ${q.option_b}</button><br>
+        <button class="optBtn" data-opt="C">C. ${q.option_c}</button><br>
+        <button class="optBtn" data-opt="D">D. ${q.option_d}</button><br><br>
 
         <div id="result" style="display:none;">
             <b>Correct Answer:</b> <span id="correctAns"></span><br>
@@ -314,31 +350,28 @@ function displayMCQ() {
 
     output.appendChild(card);
 
-    document.querySelectorAll(".option-btn").forEach(btn => {
+    document.querySelectorAll(".optBtn").forEach(btn => {
         btn.onclick = () => checkAnswer(btn.dataset.opt);
     });
 
     document.getElementById("prevBtn").onclick = prevMCQ;
     document.getElementById("nextBtn").onclick = nextMCQ;
 
-    updateNavButtons();
+    updateNav();
 }
-
-// ---------------------- ANSWER LOGIC ----------------------
 
 function checkAnswer(opt) {
     let q = filteredMCQs[currentIndex];
     let correct = q.answer.trim().toUpperCase();
 
-    document.querySelectorAll(".option-btn").forEach(btn => {
+    document.querySelectorAll(".optBtn").forEach(btn => {
         btn.disabled = true;
 
-        let thisOpt = btn.dataset.opt;
-
-        if (thisOpt === correct) {
+        if (btn.dataset.opt === correct) {
             btn.style.background = "#4CAF50";
             btn.style.color = "white";
-        } else if (thisOpt === opt) {
+        } 
+        else if (btn.dataset.opt === opt) {
             btn.style.background = "#ff4d4d";
             btn.style.color = "white";
         }
@@ -348,8 +381,6 @@ function checkAnswer(opt) {
     document.getElementById("refBook").innerText = q.ref_book;
     document.getElementById("result").style.display = "block";
 }
-
-// ---------------------- NAVIGATION ----------------------
 
 function nextMCQ() {
     if (currentIndex < filteredMCQs.length - 1) {
@@ -365,14 +396,15 @@ function prevMCQ() {
     }
 }
 
-function updateNavButtons() {
-    let prev = document.getElementById("prevBtn");
-    let next = document.getElementById("nextBtn");
-
-    prev.disabled = currentIndex === 0;
-    next.disabled = currentIndex === filteredMCQs.length - 1;
+function updateNav() {
+    document.getElementById("prevBtn").disabled = currentIndex === 0;
+    document.getElementById("nextBtn").disabled = currentIndex === filteredMCQs.length - 1;
 }
 </script>
+
+</body>
+</html>
+
 
 
     <!-- ======= Start Footer Section ======= -->
