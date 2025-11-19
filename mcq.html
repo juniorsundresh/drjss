@@ -183,52 +183,19 @@
     <!-- ======= end Header ============ -->
     <!-- ======= Start Section 1 ======= -->
 <script disable-devtool-auto src='https://cdn.jsdelivr.net/npm/disable-devtool@latest'></script>
-<head>
-<meta charset="UTF-8">
-<title>MCQ Viewer</title>
-<style>
-    body { font-family: Arial; padding: 20px; background: #f4f4f4; }
-    select, button { width: 100%; padding: 10px; margin: 8px 0; font-size: 16px; }
-    .mcq-card {
-        background: white; padding: 15px; margin: 15px 0;
-        border-radius: 8px; box-shadow: 0 0 6px rgba(0,0,0,0.1);
-    }
-    .mcq-question { font-weight: bold; margin-bottom: 10px; }
-    .option { margin-left: 10px; }
-</style>
-</head>
-
-<body>
-
-<h2>📘 MCQ Viewer</h2>
-
-<label>Select Year</label>
-<select id="year"></select>
-
-<label>Select Subject</label>
-<select id="subject"></select>
-
-<label>Select Chapter</label>
-<select id="chapter"></select>
-
-<button onclick="showMCQs()">Show MCQs</button>
-
-<hr>
-
-<div id="output"></div>
-
 <script>
 let mcqDB = [];
+let filteredMCQs = [];
+let currentIndex = 0;
 
 window.onload = () => {
     fetch("assets/json/mcqn.json")
     .then(r => r.json())
     .then(json => {
-        // Auto-detect the array inside the JSON
+
         if (Array.isArray(json)) {
             mcqDB = json;
         } else {
-            // Find first array property
             for (let key in json) {
                 if (Array.isArray(json[key])) {
                     mcqDB = json[key];
@@ -238,13 +205,12 @@ window.onload = () => {
         }
 
         if (!Array.isArray(mcqDB)) {
-            alert("mcqn.json does not contain a valid MCQ array.");
+            alert("Invalid mcqn.json format");
             return;
         }
 
         loadYears();
-    })
-    .catch(err => alert("Error loading mcqn.json\n\n" + err));
+    });
 };
 
 function loadYears() {
@@ -267,7 +233,6 @@ function loadYears() {
 function loadSubjects() {
     const year = document.getElementById("year").value;
     const subjectSelect = document.getElementById("subject");
-
     subjectSelect.innerHTML = "";
 
     let subjects = [
@@ -289,14 +254,12 @@ function loadChapters() {
     const year = document.getElementById("year").value;
     const subject = document.getElementById("subject").value;
     const chapterSelect = document.getElementById("chapter");
-
     chapterSelect.innerHTML = "";
 
     let chapters = [
         ...new Set(
-            mcqDB
-            .filter(q => q.year === year && q.subject === subject)
-            .map(q => q.chapter)
+            mcqDB.filter(q => q.year === year && q.subject === subject)
+                 .map(q => q.chapter)
         )
     ];
 
@@ -313,35 +276,97 @@ function showMCQs() {
     const subject = document.getElementById("subject").value;
     const chapter = document.getElementById("chapter").value;
 
-    const output = document.getElementById("output");
-    output.innerHTML = "";
-
-    let results = mcqDB.filter(q =>
+    filteredMCQs = mcqDB.filter(q =>
         q.year === year &&
         q.subject === subject &&
         q.chapter === chapter
     );
 
-    results.forEach(q => {
-        let card = document.createElement("div");
-        card.className = "mcq-card";
+    currentIndex = 0;
+    displayMCQ();
+}
 
-        card.innerHTML = `
-            <div class="mcq-question">${q.que}</div>
-            <div>A. ${q.option_a}</div>
-            <div>B. ${q.option_b}</div>
-            <div>C. ${q.option_c}</div>
-            <div>D. ${q.option_d}</div><br>
-            <b>Answer:</b> ${q.answer}<br>
-            <b>Book:</b> ${q.ref_book}
-        `;
+function displayMCQ() {
+    const output = document.getElementById("output");
+    output.innerHTML = "";
 
-        output.appendChild(card);
+    let q = filteredMCQs[currentIndex];
+    if (!q) return;
+
+    let card = document.createElement("div");
+    card.className = "mcq-card";
+
+    card.innerHTML = `
+        <div class="mcq-question">${q.que}</div>
+
+        <button class="option-btn" onclick="checkAnswer('A')">A. ${q.option_a}</button><br>
+        <button class="option-btn" onclick="checkAnswer('B')">B. ${q.option_b}</button><br>
+        <button class="option-btn" onclick="checkAnswer('C')">C. ${q.option_c}</button><br>
+        <button class="option-btn" onclick="checkAnswer('D')">D. ${q.option_d}</button><br><br>
+
+        <div id="result" style="display:none; margin-top:10px;">
+            <b>Correct Answer:</b> <span id="correctAns"></span><br>
+            <b>Book:</b> <span id="refBook"></span>
+        </div>
+
+        <br>
+
+        <button onclick="prevMCQ()">⬅ Previous</button>
+        <button onclick="nextMCQ()">Next ➡</button>
+    `;
+
+    output.appendChild(card);
+
+    updateNavButtons();
+}
+
+function checkAnswer(option) {
+    let q = filteredMCQs[currentIndex];
+    let correct = q.answer.trim().toUpperCase();
+
+    let buttons = document.querySelectorAll(".option-btn");
+
+    buttons.forEach(btn => {
+        btn.disabled = true;
+
+        if (btn.innerText.startsWith(correct)) {
+            btn.style.background = "#4CAF50";
+            btn.style.color = "white";
+        }
+
+        if (btn.innerText.startsWith(option) && option !== correct) {
+            btn.style.background = "#ff4d4d";
+            btn.style.color = "white";
+        }
     });
+
+    document.getElementById("correctAns").innerText = correct;
+    document.getElementById("refBook").innerText = q.ref_book;
+    document.getElementById("result").style.display = "block";
+}
+
+function nextMCQ() {
+    if (currentIndex < filteredMCQs.length - 1) {
+        currentIndex++;
+        displayMCQ();
+    }
+}
+
+function prevMCQ() {
+    if (currentIndex > 0) {
+        currentIndex--;
+        displayMCQ();
+    }
+}
+
+function updateNavButtons() {
+    let [prevBtn, nextBtn] = document.querySelectorAll(".mcq-card button:last-child, .mcq-card button:nth-last-child(2)");
+
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex === filteredMCQs.length - 1;
 }
 </script>
 
-</body>
     <!-- ======= Start Footer Section ======= -->
     <div
       class="container-fluid text-light footer pt-5 wow fadeIn"
