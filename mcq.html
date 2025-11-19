@@ -187,138 +187,135 @@
 <meta charset="UTF-8">
 <title>MCQ Viewer</title>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #eef1f5;
-        padding: 20px;
-    }
-    select, button {
-        width: 100%;
-        padding: 10px;
-        margin: 8px 0;
-        font-size: 16px;
-    }
+    body { font-family: Arial; padding: 20px; background: #f4f4f4; }
+    select, button { width: 100%; padding: 10px; margin: 8px 0; font-size: 16px; }
     .mcq-card {
-        background: #fff;
-        padding: 15px;
-        margin: 12px 0;
-        border-radius: 10px;
-        box-shadow: 0 0 6px rgba(0,0,0,0.1);
+        background: white; padding: 15px; margin: 15px 0;
+        border-radius: 8px; box-shadow: 0 0 6px rgba(0,0,0,0.1);
     }
-    .option { margin: 4px 0; }
-    .correct {
-        color: green;
-        font-weight: bold;
-        margin-top: 10px;
-    }
-    .explanation {
-        margin-top: 10px;
-        background: #f7f7f7;
-        padding: 10px;
-        border-left: 4px solid #4285f4;
-    }
+    .mcq-question { font-weight: bold; margin-bottom: 10px; }
+    .option { margin-left: 10px; }
 </style>
 </head>
 
 <body>
 
-<h2>📘 MCQ Browser</h2>
+<h2>📘 MCQ Viewer</h2>
 
-<label>Subject</label>
+<label>Select Year</label>
+<select id="year"></select>
+
+<label>Select Subject</label>
 <select id="subject"></select>
 
-<label>Part</label>
-<select id="part"></select>
-
-<label>Chapter</label>
+<label>Select Chapter</label>
 <select id="chapter"></select>
 
 <button onclick="showMCQs()">Show MCQs</button>
 
 <hr>
+
 <div id="output"></div>
 
 <script>
-let db = null;
+let mcqDB = [];
 
-// Load mcqn.json
 window.onload = () => {
     fetch("assets/json/mcqn.json")
-        .then(res => res.json())
-        .then(json => {
-            db = json;
-            populateSubjects();
-        })
-        .catch(err => alert("Error loading mcqn.json:\n" + err));
+    .then(r => r.json())
+    .then(json => {
+        mcqDB = json;
+        loadYears();
+    })
+    .catch(err => alert("Error loading mcqn.json\n\n" + err));
 };
 
-function populateSubjects() {
-    const sub = document.getElementById("subject");
-    sub.innerHTML = "";
+function loadYears() {
+    const yearSelect = document.getElementById("year");
+    let years = [...new Set(mcqDB.map(q => q.year))];
 
-    for (let subject in db.subjects) {
-        sub.innerHTML += `<option value="${subject}">${subject}</option>`;
-    }
+    years.forEach(y => {
+        let opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = y;
+        yearSelect.appendChild(opt);
+    });
 
-    sub.onchange = populateParts;
-    populateParts();
+    yearSelect.onchange = loadSubjects;
+    loadSubjects();
 }
 
-function populateParts() {
-    const subject = document.getElementById("subject").value;
-    const parts = db.subjects[subject].parts;
+function loadSubjects() {
+    const year = document.getElementById("year").value;
+    const subjectSelect = document.getElementById("subject");
 
-    const partSel = document.getElementById("part");
-    partSel.innerHTML = "";
+    subjectSelect.innerHTML = "";
 
-    for (let p in parts) {
-        partSel.innerHTML += `<option value="${p}">${p}</option>`;
-    }
+    let subjects = [...new Set(
+        mcqDB.filter(q => q.year === year).map(q => q.subject)
+    )];
 
-    partSel.onchange = populateChapters;
-    populateChapters();
+    subjects.forEach(sub => {
+        let opt = document.createElement("option");
+        opt.value = sub;
+        opt.textContent = sub;
+        subjectSelect.appendChild(opt);
+    });
+
+    subjectSelect.onchange = loadChapters;
+    loadChapters();
 }
 
-function populateChapters() {
+function loadChapters() {
+    const year = document.getElementById("year").value;
     const subject = document.getElementById("subject").value;
-    const part = document.getElementById("part").value;
+    const chapterSelect = document.getElementById("chapter");
 
-    const chapters = db.subjects[subject].parts[part].chapters;
+    chapterSelect.innerHTML = "";
 
-    const chapSel = document.getElementById("chapter");
-    chapSel.innerHTML = "";
+    let chapters = [...new Set(
+        mcqDB.filter(q => q.year === year && q.subject === subject)
+             .map(q => q.chapter)
+    )];
 
-    for (let ch in chapters) {
-        chapSel.innerHTML += `<option value="${ch}">${ch}</option>`;
-    }
+    chapters.forEach(ch => {
+        let opt = document.createElement("option");
+        opt.value = ch;
+        opt.textContent = ch;
+        chapterSelect.appendChild(opt);
+    });
 }
 
 function showMCQs() {
+    const year = document.getElementById("year").value;
     const subject = document.getElementById("subject").value;
-    const part = document.getElementById("part").value;
     const chapter = document.getElementById("chapter").value;
 
     const output = document.getElementById("output");
     output.innerHTML = "";
 
-    const questions = db.subjects[subject].parts[part].chapters[chapter].questions;
+    let results = mcqDB.filter(q =>
+        q.year === year &&
+        q.subject === subject &&
+        q.chapter === chapter
+    );
 
-    questions.forEach(q => {
-        output.innerHTML += `
-            <div class="mcq-card">
-                <h3>Q${q.id}</h3>
-                <p>${q.question_text}</p>
+    results.forEach(q => {
+        let card = document.createElement("div");
+        card.className = "mcq-card";
 
-                <div class="option">A) ${q.options.A}</div>
-                <div class="option">B) ${q.options.B}</div>
-                <div class="option">C) ${q.options.C}</div>
-                <div class="option">D) ${q.options.D}</div>
-
-                <div class="correct">Correct Answer: ${q.correctanswer}</div>
-
-                ${q.explanation ? `<div class="explanation">${q.explanation}</div>` : ""}
-            </div>
+        card.innerHTML = `
+            <div class="mcq-question">${q.que}</div>
+            <div class='option'>A. ${q.option_a}</div>
+            <div class='option'>B. ${q.option_b}</div>
+            <div class='option'>C. ${q.option_c}</div>
+            <div class='option'>D. ${q.option_d}</div>
+            <br>
+            <b>Answer:</b> ${q.answer.toUpperCase()}<br>
+            <b>Book:</b> ${q.ref_book}
         `;
+
+        output.appendChild(card);
     });
 }
 </script>
