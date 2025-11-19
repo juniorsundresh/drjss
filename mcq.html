@@ -224,7 +224,24 @@ window.onload = () => {
     fetch("assets/json/mcqn.json")
     .then(r => r.json())
     .then(json => {
-        mcqDB = json;
+        // Auto-detect the array inside the JSON
+        if (Array.isArray(json)) {
+            mcqDB = json;
+        } else {
+            // Find first array property
+            for (let key in json) {
+                if (Array.isArray(json[key])) {
+                    mcqDB = json[key];
+                    break;
+                }
+            }
+        }
+
+        if (!Array.isArray(mcqDB)) {
+            alert("mcqn.json does not contain a valid MCQ array.");
+            return;
+        }
+
         loadYears();
     })
     .catch(err => alert("Error loading mcqn.json\n\n" + err));
@@ -232,6 +249,8 @@ window.onload = () => {
 
 function loadYears() {
     const yearSelect = document.getElementById("year");
+    yearSelect.innerHTML = "";
+
     let years = [...new Set(mcqDB.map(q => q.year))];
 
     years.forEach(y => {
@@ -251,9 +270,9 @@ function loadSubjects() {
 
     subjectSelect.innerHTML = "";
 
-    let subjects = [...new Set(
-        mcqDB.filter(q => q.year === year).map(q => q.subject)
-    )];
+    let subjects = [
+        ...new Set(mcqDB.filter(q => q.year === year).map(q => q.subject))
+    ];
 
     subjects.forEach(sub => {
         let opt = document.createElement("option");
@@ -273,10 +292,13 @@ function loadChapters() {
 
     chapterSelect.innerHTML = "";
 
-    let chapters = [...new Set(
-        mcqDB.filter(q => q.year === year && q.subject === subject)
-             .map(q => q.chapter)
-    )];
+    let chapters = [
+        ...new Set(
+            mcqDB
+            .filter(q => q.year === year && q.subject === subject)
+            .map(q => q.chapter)
+        )
+    ];
 
     chapters.forEach(ch => {
         let opt = document.createElement("option");
@@ -306,12 +328,11 @@ function showMCQs() {
 
         card.innerHTML = `
             <div class="mcq-question">${q.que}</div>
-            <div class='option'>A. ${q.option_a}</div>
-            <div class='option'>B. ${q.option_b}</div>
-            <div class='option'>C. ${q.option_c}</div>
-            <div class='option'>D. ${q.option_d}</div>
-            <br>
-            <b>Answer:</b> ${q.answer.toUpperCase()}<br>
+            <div>A. ${q.option_a}</div>
+            <div>B. ${q.option_b}</div>
+            <div>C. ${q.option_c}</div>
+            <div>D. ${q.option_d}</div><br>
+            <b>Answer:</b> ${q.answer}<br>
             <b>Book:</b> ${q.ref_book}
         `;
 
